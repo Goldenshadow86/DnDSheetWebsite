@@ -52,6 +52,10 @@ const SECTIONS: { title: string; fields: string[] }[] = [
     ],
   },
   {
+    title: "Money",
+    fields: ["plat", "gold", "silver", "copper"],
+  },
+  {
     title: "Other",
     fields: [
       "inspiration",
@@ -118,6 +122,10 @@ const LABELS: Record<string, string> = {
   otherProficiencies: "Other proficiencies & languages",
   languages: "Languages",
   equipment: "Equipment",
+  plat: "Plat (pp)",
+  gold: "Gold (gp)",
+  silver: "Silver (sp)",
+  copper: "Copper (cp)",
   attacksAndSpellcasting: "Attacks & spellcasting",
   featuresAndTraits: "Features & traits",
   personalityTraits: "Personality traits",
@@ -158,6 +166,28 @@ function skillStoredAsOne(raw: string): boolean {
 /** Always "1" or "0" for export/API consistency. */
 function skillToBinary(raw: string): string {
   return skillStoredAsOne(raw) ? "1" : "0";
+}
+
+/** Ability scores use fixed point-buy style dropdowns only. */
+const ABILITY_FIELDS = new Set([
+  "strength",
+  "dexterity",
+  "constitution",
+  "intelligence",
+  "wisdom",
+  "charisma",
+]);
+
+/** Allowed scores and their 5e modifiers (floor((score - 10) / 2)). */
+const ABILITY_SCORE_OPTIONS = [8, 10, 12, 13, 14, 15] as const;
+
+function abilityModifier(score: number): number {
+  return Math.floor((score - 10) / 2);
+}
+
+function formatModifier(mod: number): string {
+  if (mod === 0) return "+0";
+  return mod > 0 ? `+${mod}` : `${mod}`;
 }
 
 const TEXTAREA_FIELDS = new Set([
@@ -233,6 +263,15 @@ function parseImportedTxt(text: string): { sheet: CharacterSheet; matched: numbe
     if (value === "(empty)") value = "";
     if (SKILL_FIELDS.has(key)) {
       value = skillToBinary(value);
+    }
+    // Ability scores: only keep value if it matches a dropdown option (otherwise clear so UI shows placeholder).
+    if (ABILITY_FIELDS.has(key)) {
+      const n = parseInt(value.trim(), 10);
+      if (!ABILITY_SCORE_OPTIONS.includes(n as (typeof ABILITY_SCORE_OPTIONS)[number])) {
+        value = "";
+      } else {
+        value = String(n);
+      }
     }
     sheet[key] = value;
     matched++;
@@ -346,9 +385,20 @@ export function PlayerSheet() {
       )}
 
       {SECTIONS.map((section) => (
-        <div key={section.title} className="sheet-section">
+        <div
+          key={section.title}
+          className={section.title === "Other" ? "sheet-section other-section" : "sheet-section"}
+        >
           <h2>{section.title}</h2>
-          <div className={section.fields.length > 6 ? "skills-grid" : "grid-2"}>
+          <div
+            className={
+              section.title === "Other"
+                ? "other-section-grid"
+                : section.fields.length > 6
+                  ? "skills-grid"
+                  : "grid-2"
+            }
+          >
             {section.fields.map((key) => (
               <div key={key} className="field">
                 {SKILL_FIELDS.has(key) ? (
@@ -372,12 +422,45 @@ export function PlayerSheet() {
                       {LABELS[key] ?? key}
                     </label>
                   </div>
+                ) : ABILITY_FIELDS.has(key) ? (
+                  <>
+                    <label htmlFor={key}>{LABELS[key] ?? key}</label>
+                    <select
+                      id={key}
+                      value={
+                        ABILITY_SCORE_OPTIONS.includes(
+                          parseInt(sheet[key] ?? "", 10) as (typeof ABILITY_SCORE_OPTIONS)[number]
+                        )
+                          ? sheet[key]
+                          : ""
+                      }
+                      onChange={(e) => updateField(key, e.target.value)}
+                      style={{
+                        width: "100%",
+                        padding: "0.5rem 0.6rem",
+                        borderRadius: "6px",
+                        border: "1px solid var(--border)",
+                        background: "var(--panel)",
+                        color: "inherit",
+                        fontSize: "1rem",
+                      }}
+                    >
+                      <option value="">— Select score —</option>
+                      {ABILITY_SCORE_OPTIONS.map((score) => (
+                        <option key={score} value={String(score)}>
+                          {score} ({formatModifier(abilityModifier(score))})
+                        </option>
+                      ))}
+                    </select>
+                  </>
                 ) : (
                   <>
                     <label htmlFor={key}>{LABELS[key] ?? key}</label>
                     {TEXTAREA_FIELDS.has(key) ? (
                       <textarea
                         id={key}
+                        className="sheet-textarea-large"
+                        rows={8}
                         value={sheet[key] ?? ""}
                         onChange={(e) => updateField(key, e.target.value)}
                         placeholder="—"

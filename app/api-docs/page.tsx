@@ -18,6 +18,7 @@ const FIELDS = [
   "intimidation", "investigation", "medicine", "nature", "perception", "performance",
   "persuasion", "religion", "sleightOfHand", "stealth", "survival",
   "inspiration", "passiveWisdom", "otherProficiencies", "languages", "equipment",
+  "plat", "gold", "silver", "copper",
   "attacksAndSpellcasting", "featuresAndTraits", "personalityTraits", "ideals", "bonds", "flaws",
   "backstory", "appearance",
 ];

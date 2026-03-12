@@ -132,6 +132,24 @@ button.secondary {
   resize: vertical;
 }
 
+/* Other section: long-form fields — full width, taller textareas */
+.other-section-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 1.25rem;
+}
+
+.sheet-textarea-large,
+.other-section .field textarea {
+  min-height: 12rem;
+  line-height: 1.5;
+  padding: 0.6rem 0.75rem;
+}
+
+.other-section .field {
+  margin-bottom: 0;
+}
+
 .checkbox-field {
   display: flex;
   align-items: center;

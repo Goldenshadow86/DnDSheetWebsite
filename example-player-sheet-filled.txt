@@ -55,6 +55,13 @@ Sleight of hand: 0
 Stealth: 0
 Survival: 1
 
+MONEY
+-----
+Plat (pp): 0
+Gold (gp): 15
+Silver (sp): 0
+Copper (cp): 0
+
 OTHER
 -----
 Inspiration: 1
