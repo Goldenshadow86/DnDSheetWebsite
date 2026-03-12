@@ -1,0 +1,95 @@
+generator client {
+  provider      = "prisma-client-js"
+  engineType    = "binary"
+  binaryTargets = ["native", "debian-openssl-1.1.x", "debian-openssl-3.0.x", "linux-musl-openssl-3.0.x"]
+}
+
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id            String     @id @default(cuid())
+  discordId     String     @unique
+  username      String
+  discriminator String?
+  avatar        String?
+  email         String?
+  createdAt     DateTime   @default(now())
+  updatedAt     DateTime   @updatedAt
+  character     Character?
+}
+
+model Character {
+  id        String   @id @default(cuid())
+  userId    String   @unique
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  // Basics
+  characterName  String @default("")
+  playerName     String @default("")
+  race           String @default("")
+  classAndLevel  String @default("")
+  background     String @default("")
+  alignment      String @default("")
+  experience     String @default("0")
+
+  // Ability scores (store as string for display, we can parse for calculations)
+  strength     String @default("10")
+  dexterity    String @default("10")
+  constitution String @default("10")
+  intelligence String @default("10")
+  wisdom       String @default("10")
+  charisma     String @default("10")
+
+  // Combat
+  armorClass        String @default("10")
+  initiative        String @default("0")
+  speed             String @default("30")
+  hitPointMaximum   String @default("")
+  currentHitPoints  String @default("")
+  temporaryHitPoints String @default("0")
+  hitDice           String @default("")
+  deathSaveSuccess  String @default("0")
+  deathSaveFailures String @default("0")
+  proficiencyBonus  String @default("+2")
+
+  // Skills (proficient = true/false or "1"/"0")
+  acrobatics     String @default("0")
+  animalHandling String @default("0")
+  arcana         String @default("0")
+  athletics      String @default("0")
+  deception      String @default("0")
+  history        String @default("0")
+  insight        String @default("0")
+  intimidation   String @default("0")
+  investigation  String @default("0")
+  medicine       String @default("0")
+  nature         String @default("0")
+  perception     String @default("0")
+  performance    String @default("0")
+  persuasion     String @default("0")
+  religion       String @default("0")
+  sleightOfHand  String @default("0")
+  stealth        String @default("0")
+  survival       String @default("0")
+
+  // Other
+  inspiration     String @default("0")
+  passiveWisdom   String @default("10")
+  otherProficiencies String @default("")
+  languages       String @default("")
+  equipment       String @default("")
+  attacksAndSpellcasting String @default("")
+  featuresAndTraits String @default("")
+  personalityTraits String @default("")
+  ideals          String @default("")
+  bonds           String @default("")
+  flaws           String @default("")
+  backstory       String @default("")
+  appearance      String @default("")
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}

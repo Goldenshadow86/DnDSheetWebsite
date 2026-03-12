@@ -1,0 +1,67 @@
+import { PrismaClient } from "@prisma/client";
+
+const globalForPrisma = globalThis as unknown as { prisma: PrismaClient };
+
+export const prisma =
+  globalForPrisma.prisma ??
+  new PrismaClient();
+
+if (process.env.NODE_ENV !== "production") globalForPrisma.prisma = prisma;
+
+// All character sheet fields that can be accessed via API (key = API path, value = DB column)
+export const CHARACTER_FIELDS: Record<string, string> = {
+  characterName: "characterName",
+  playerName: "playerName",
+  race: "race",
+  classAndLevel: "classAndLevel",
+  background: "background",
+  alignment: "alignment",
+  experience: "experience",
+  strength: "strength",
+  dexterity: "dexterity",
+  constitution: "constitution",
+  intelligence: "intelligence",
+  wisdom: "wisdom",
+  charisma: "charisma",
+  armorClass: "armorClass",
+  initiative: "initiative",
+  speed: "speed",
+  hitPointMaximum: "hitPointMaximum",
+  currentHitPoints: "currentHitPoints",
+  temporaryHitPoints: "temporaryHitPoints",
+  hitDice: "hitDice",
+  deathSaveSuccess: "deathSaveSuccess",
+  deathSaveFailures: "deathSaveFailures",
+  proficiencyBonus: "proficiencyBonus",
+  acrobatics: "acrobatics",
+  animalHandling: "animalHandling",
+  arcana: "arcana",
+  athletics: "athletics",
+  deception: "deception",
+  history: "history",
+  insight: "insight",
+  intimidation: "intimidation",
+  investigation: "investigation",
+  medicine: "medicine",
+  nature: "nature",
+  perception: "perception",
+  performance: "performance",
+  persuasion: "persuasion",
+  religion: "religion",
+  sleightOfHand: "sleightOfHand",
+  stealth: "stealth",
+  survival: "survival",
+  inspiration: "inspiration",
+  passiveWisdom: "passiveWisdom",
+  otherProficiencies: "otherProficiencies",
+  languages: "languages",
+  equipment: "equipment",
+  attacksAndSpellcasting: "attacksAndSpellcasting",
+  featuresAndTraits: "featuresAndTraits",
+  personalityTraits: "personalityTraits",
+  ideals: "ideals",
+  bonds: "bonds",
+  flaws: "flaws",
+  backstory: "backstory",
+  appearance: "appearance",
+};
