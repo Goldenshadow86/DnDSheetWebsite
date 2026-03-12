@@ -5,6 +5,10 @@ import "./globals.css";
 export const metadata: Metadata = {
   title: "D&D Player Sheet",
   description: "Fill out your D&D character sheet in the browser and export to a .txt file.",
+  icons: {
+    icon: "/icon.svg",
+    apple: "/icon.svg",
+  },
 };
 
 export default function RootLayout({
