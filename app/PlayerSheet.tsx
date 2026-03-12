@@ -89,6 +89,12 @@ const LABELS: Record<string, string> = {
   intelligence: "Intelligence",
   wisdom: "Wisdom",
   charisma: "Charisma",
+  strengthSave: "Strength (save)",
+  dexteritySave: "Dexterity (save)",
+  constitutionSave: "Constitution (save)",
+  intelligenceSave: "Intelligence (save)",
+  wisdomSave: "Wisdom (save)",
+  charismaSave: "Charisma (save)",
   armorClass: "Armor class",
   initiative: "Initiative",
   speed: "Speed",
@@ -136,6 +142,9 @@ const LABELS: Record<string, string> = {
   appearance: "Appearance",
 };
 
+/** Inspiration is a single checkbox stored as "1" or "0". */
+const INSPIRATION_FIELD = "inspiration";
+
 /** Skill fields stored as "1" (proficient) or "0" in DB/export; UI uses checkboxes. */
 const SKILL_FIELDS = new Set([
   "acrobatics",
@@ -177,6 +186,11 @@ const ABILITY_FIELDS = new Set([
   "wisdom",
   "charisma",
 ]);
+
+/** Saving throw proficiency per ability: stored as "1" or "0". */
+const SAVE_PROFICIENCY_FIELDS = new Set(
+  Array.from(ABILITY_FIELDS).map((a) => `${a}Save`)
+);
 
 /** Allowed scores and their 5e modifiers (floor((score - 10) / 2)). */
 const ABILITY_SCORE_OPTIONS = [8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18] as const;
@@ -234,10 +248,17 @@ function buildTxt(sheet: CharacterSheet): string {
     for (const key of section.fields) {
       const label = LABELS[key] ?? key;
       const raw = sheet[key] ?? "";
-      const value = SKILL_FIELDS.has(key)
-        ? skillToBinary(raw)
-        : raw.trim() || "(empty)";
+      const value =
+        SKILL_FIELDS.has(key) || key === INSPIRATION_FIELD || SAVE_PROFICIENCY_FIELDS.has(key)
+          ? skillToBinary(raw)
+          : raw.trim() || "(empty)";
       lines.push(`${label}: ${value}`);
+      if (ABILITY_FIELDS.has(key)) {
+        const saveKey = `${key}Save`;
+        const saveLabel = LABELS[saveKey] ?? saveKey;
+        const saveRaw = sheet[saveKey] ?? "";
+        lines.push(`${saveLabel}: ${skillToBinary(saveRaw)}`);
+      }
     }
     lines.push("");
   }
@@ -281,7 +302,7 @@ function parseImportedTxt(text: string): { sheet: CharacterSheet; matched: numbe
     if (!key) continue;
 
     if (value === "(empty)") value = "";
-    if (SKILL_FIELDS.has(key)) {
+    if (SKILL_FIELDS.has(key) || key === INSPIRATION_FIELD || SAVE_PROFICIENCY_FIELDS.has(key)) {
       value = skillToBinary(value);
     }
     // Ability scores: only keep value if it matches a dropdown option (otherwise clear so UI shows placeholder).
@@ -311,8 +332,11 @@ export function PlayerSheet() {
     const s: CharacterSheet = {};
     for (const sec of SECTIONS) {
       for (const f of sec.fields) {
-        s[f] = SKILL_FIELDS.has(f) ? "0" : "";
+        s[f] = SKILL_FIELDS.has(f) || f === INSPIRATION_FIELD ? "0" : "";
       }
+    }
+    for (const ab of Array.from(ABILITY_FIELDS)) {
+      s[`${ab}Save`] = "0";
     }
     return s;
   }, []);
@@ -428,7 +452,7 @@ export function PlayerSheet() {
           >
             {section.fields.map((key) => (
               <div key={key} className="field">
-                {SKILL_FIELDS.has(key) ? (
+                {SKILL_FIELDS.has(key) || key === INSPIRATION_FIELD ? (
                   <div
                     className="skill-checkbox-row"
                     style={{
@@ -442,7 +466,9 @@ export function PlayerSheet() {
                       id={key}
                       type="checkbox"
                       checked={skillStoredAsOne(sheet[key] ?? "")}
-                      onChange={(e) => updateField(key, e.target.checked ? "1" : "0")}
+                      onChange={(e) =>
+                        updateField(key, e.target.checked ? "1" : "0")
+                      }
                       style={{ width: "1.15rem", height: "1.15rem", cursor: "pointer" }}
                     />
                     <label htmlFor={key} style={{ margin: 0, cursor: "pointer" }}>
@@ -450,28 +476,53 @@ export function PlayerSheet() {
                     </label>
                   </div>
                 ) : ABILITY_FIELDS.has(key) ? (
-                  <>
-                    <label htmlFor={key}>{LABELS[key] ?? key}</label>
-                    <select
-                      id={key}
-                      className="sheet-select"
-                      value={
-                        ABILITY_SCORE_OPTIONS.includes(
-                          parseInt(sheet[key] ?? "", 10) as (typeof ABILITY_SCORE_OPTIONS)[number]
-                        )
-                          ? sheet[key]
-                          : ""
-                      }
-                      onChange={(e) => updateField(key, e.target.value)}
+                  <div className="ability-row" style={{ display: "flex", flexWrap: "wrap", alignItems: "center", gap: "0.5rem" }}>
+                    <div style={{ flex: "1 1 auto", minWidth: "8rem" }}>
+                      <label htmlFor={key}>{LABELS[key] ?? key}</label>
+                      <select
+                        id={key}
+                        className="sheet-select"
+                        value={
+                          ABILITY_SCORE_OPTIONS.includes(
+                            parseInt(sheet[key] ?? "", 10) as (typeof ABILITY_SCORE_OPTIONS)[number]
+                          )
+                            ? sheet[key]
+                            : ""
+                        }
+                        onChange={(e) => updateField(key, e.target.value)}
+                      >
+                        <option value="">— Select score —</option>
+                        {ABILITY_SCORE_OPTIONS.map((score) => (
+                          <option key={score} value={String(score)}>
+                            {score} ({formatModifier(abilityModifier(score))})
+                          </option>
+                        ))}
+                      </select>
+                    </div>
+                    <div
+                      className="save-proficiency-row"
+                      style={{
+                        display: "flex",
+                        alignItems: "center",
+                        gap: "0.35rem",
+                        minHeight: "2.25rem",
+                      }}
                     >
-                      <option value="">— Select score —</option>
-                      {ABILITY_SCORE_OPTIONS.map((score) => (
-                        <option key={score} value={String(score)}>
-                          {score} ({formatModifier(abilityModifier(score))})
-                        </option>
-                      ))}
-                    </select>
-                  </>
+                      <input
+                        id={`${key}Save`}
+                        type="checkbox"
+                        checked={skillStoredAsOne(sheet[`${key}Save`] ?? "")}
+                        onChange={(e) =>
+                          updateField(`${key}Save`, e.target.checked ? "1" : "0")
+                        }
+                        style={{ width: "1.1rem", height: "1.1rem", cursor: "pointer" }}
+                        title="Proficient in this saving throw"
+                      />
+                      <label htmlFor={`${key}Save`} style={{ margin: 0, cursor: "pointer", fontSize: "0.85rem", color: "var(--muted)" }}>
+                        Save
+                      </label>
+                    </div>
+                  </div>
                 ) : ALIGNMENT_FIELDS.has(key) ? (
                   <>
                     <label htmlFor={key}>{LABELS[key] ?? key}</label>
