@@ -1,12 +1,12 @@
-# Dependencies
-node_modules
-.pnp
-.pnp.js
+# # Dependencies
+# node_modules
+# .pnp
+# .pnp.js
 
-# Build
-.next
-out
-dist
+# # Build
+# .next
+# out
+# dist
 
 # Env
 .env
@@ -23,5 +23,5 @@ npm-debug.log*
 *.tsbuildinfo
 next-env.d.ts
 
-# Prisma
-prisma/migrations/**/migration_lock.toml
+# # Prisma
+# prisma/migrations/**/migration_lock.toml
