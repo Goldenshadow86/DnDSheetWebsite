@@ -1,1 +1,9 @@
-{}
+{
+  "/_not-found/page": "app/_not-found/page.js",
+  "/api-docs/page": "app/api-docs/page.js",
+  "/api/character/[field]/route": "app/api/character/[field]/route.js",
+  "/api/auth/[...nextauth]/route": "app/api/auth/[...nextauth]/route.js",
+  "/api/character/route": "app/api/character/route.js",
+  "/page": "app/page.js",
+  "/sheet/page": "app/sheet/page.js"
+}
