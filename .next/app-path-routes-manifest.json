@@ -1,1 +1,1 @@
-{"/_not-found/page":"/_not-found","/api-docs/page":"/api-docs","/api/character/[field]/route":"/api/character/[field]","/api/auth/[...nextauth]/route":"/api/auth/[...nextauth]","/api/character/route":"/api/character","/page":"/","/sheet/page":"/sheet"}
+{"/_not-found/page":"/_not-found","/api/auth/[...nextauth]/route":"/api/auth/[...nextauth]","/api-docs/page":"/api-docs","/sheet/page":"/sheet","/api/character/[field]/route":"/api/character/[field]","/page":"/","/api/character/route":"/api/character"}

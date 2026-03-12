@@ -179,7 +179,7 @@ const ABILITY_FIELDS = new Set([
 ]);
 
 /** Allowed scores and their 5e modifiers (floor((score - 10) / 2)). */
-const ABILITY_SCORE_OPTIONS = [8, 10, 12, 13, 14, 15] as const;
+const ABILITY_SCORE_OPTIONS = [8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18] as const;
 
 function abilityModifier(score: number): number {
   return Math.floor((score - 10) / 2);
