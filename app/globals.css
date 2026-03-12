@@ -156,7 +156,8 @@ button.secondary {
 }
 
 .field input,
-.field textarea {
+.field textarea,
+.field select {
   width: 100%;
 }
 

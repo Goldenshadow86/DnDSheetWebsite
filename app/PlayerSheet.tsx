@@ -79,10 +79,10 @@ const LABELS: Record<string, string> = {
   characterName: "Character name",
   playerName: "Player name",
   race: "Race",
-  classAndLevel: "Class & level",
+  classAndLevel: "Class",
   background: "Background",
   alignment: "Alignment",
-  experience: "Experience points",
+  experience: "Level",
   strength: "Strength",
   dexterity: "Dexterity",
   constitution: "Constitution",
@@ -181,6 +181,24 @@ const ABILITY_FIELDS = new Set([
 /** Allowed scores and their 5e modifiers (floor((score - 10) / 2)). */
 const ABILITY_SCORE_OPTIONS = [8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18] as const;
 
+/** D&D 5e alignment options for dropdown. */
+const ALIGNMENT_OPTIONS = [
+  "Lawful Good",
+  "Neutral Good",
+  "Chaotic Good",
+  "Lawful Neutral",
+  "True Neutral",
+  "Chaotic Neutral",
+  "Lawful Evil",
+  "Neutral Evil",
+  "Chaotic Evil",
+] as const;
+const ALIGNMENT_FIELDS = new Set(["alignment"]);
+
+/** Level options 1–20 for dropdown (stored in experience field). */
+const LEVEL_OPTIONS = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20] as const;
+const LEVEL_FIELDS = new Set(["experience"]);
+
 function abilityModifier(score: number): number {
   return Math.floor((score - 10) / 2);
 }
@@ -257,7 +275,9 @@ function parseImportedTxt(text: string): { sheet: CharacterSheet; matched: numbe
     // Trim trailing CR if any
     value = value.replace(/\r$/, "");
 
-    const key = LABEL_TO_KEY[label];
+    let key = LABEL_TO_KEY[label];
+    if (!key && label === "Experience points") key = "experience";
+    if (!key && label === "Class & level") key = "classAndLevel";
     if (!key) continue;
 
     if (value === "(empty)") value = "";
@@ -272,6 +292,12 @@ function parseImportedTxt(text: string): { sheet: CharacterSheet; matched: numbe
       } else {
         value = String(n);
       }
+    }
+    // Level (experience): only keep value if it's 1–20.
+    if (LEVEL_FIELDS.has(key)) {
+      const n = parseInt(value.trim(), 10);
+      if (Number.isNaN(n) || n < 1 || n > 20) value = "";
+      else value = String(n);
     }
     sheet[key] = value;
     matched++;
@@ -442,6 +468,50 @@ export function PlayerSheet() {
                       {ABILITY_SCORE_OPTIONS.map((score) => (
                         <option key={score} value={String(score)}>
                           {score} ({formatModifier(abilityModifier(score))})
+                        </option>
+                      ))}
+                    </select>
+                  </>
+                ) : ALIGNMENT_FIELDS.has(key) ? (
+                  <>
+                    <label htmlFor={key}>{LABELS[key] ?? key}</label>
+                    <select
+                      id={key}
+                      value={
+                        ALIGNMENT_OPTIONS.includes(
+                          (sheet[key] ?? "").trim() as (typeof ALIGNMENT_OPTIONS)[number]
+                        )
+                          ? (sheet[key] ?? "").trim()
+                          : ""
+                      }
+                      onChange={(e) => updateField(key, e.target.value)}
+                    >
+                      <option value="">— Select alignment —</option>
+                      {ALIGNMENT_OPTIONS.map((opt) => (
+                        <option key={opt} value={opt}>
+                          {opt}
+                        </option>
+                      ))}
+                    </select>
+                  </>
+                ) : LEVEL_FIELDS.has(key) ? (
+                  <>
+                    <label htmlFor={key}>{LABELS[key] ?? key}</label>
+                    <select
+                      id={key}
+                      value={
+                        LEVEL_OPTIONS.includes(
+                          parseInt(sheet[key] ?? "", 10) as (typeof LEVEL_OPTIONS)[number]
+                        )
+                          ? sheet[key]
+                          : ""
+                      }
+                      onChange={(e) => updateField(key, e.target.value)}
+                    >
+                      <option value="">— Select level —</option>
+                      {LEVEL_OPTIONS.map((n) => (
+                        <option key={n} value={String(n)}>
+                          {n}
                         </option>
                       ))}
                     </select>
