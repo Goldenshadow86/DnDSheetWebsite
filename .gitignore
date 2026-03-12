@@ -1,5 +1,7 @@
 # # Dependencies
 # node_modules
+# Next.js SWC native binary (platform-specific; installed via npm)
+next-swc.win32-x64-msvc.node
 # .pnp
 # .pnp.js
 
