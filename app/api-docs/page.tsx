@@ -1,8 +1,8 @@
 import Link from "next/link";
 
 const COMMANDS = [
-  { method: "—", path: "Import", desc: "On the home page (/), click “Import from .txt” and choose a .txt file exported from this sheet (or any file with lines like “Character name: …”). Matching fields are filled in; skills use 1/0 for checkboxes." },
-  { method: "—", path: "Export", desc: "On the home page (/), fill the player sheet and click “Export to .txt” to download all fields as a text file. Filename uses character name if set." },
+  { method: "—", path: "Import", desc: "On the home page (/), click Import and choose a .txt file exported from this sheet (or any file with lines like “Character name: …”). Matching fields are filled in; skills use 1/0 for checkboxes." },
+  { method: "—", path: "Export", desc: "On the home page (/), fill the player sheet and click Export to download all fields as a text file, then use /character import in Discord. Filename uses character name if set." },
   { method: "GET", path: "/api/character", desc: "Get your full character sheet (requires Discord sign-in)." },
   { method: "PATCH", path: "/api/character", desc: "Update your character sheet. Send a JSON body with any field names and values." },
   { method: "GET", path: "/api/character/[field]", desc: "Get a single field value. Example: GET /api/character/characterName" },

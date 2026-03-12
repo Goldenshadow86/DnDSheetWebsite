@@ -357,16 +357,17 @@ export function PlayerSheet() {
             }}
           />
           <button type="button" onClick={() => fileInputRef.current?.click()}>
-            Import from .txt
+            Import
           </button>
           <button type="button" onClick={exportTxt}>
-            Export to .txt
+            Export
           </button>
         </div>
       </div>
       <p style={{ color: "var(--muted)", marginBottom: "1.25rem", fontSize: "0.95rem" }}>
-        Fill out your character below. <strong>Import from .txt</strong> loads a previously exported file and
-        fills matching fields. <strong>Export to .txt</strong> downloads everything as a text file.
+        Fill out your character below. Once done click export and do the /character import in Discord. If you
+        would like to edit your playersheet you can import it back into the website by clicking the import
+        button.
       </p>
       {importMessage && (
         <p
@@ -476,10 +477,10 @@ export function PlayerSheet() {
 
       <div style={{ marginTop: "1.25rem", marginBottom: "2rem", display: "flex", gap: "0.75rem", flexWrap: "wrap" }}>
         <button type="button" onClick={() => fileInputRef.current?.click()}>
-          Import from .txt
+          Import
         </button>
         <button type="button" onClick={exportTxt}>
-          Export to .txt
+          Export
         </button>
       </div>
     </>
