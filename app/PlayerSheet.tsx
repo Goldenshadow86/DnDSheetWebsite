@@ -427,6 +427,7 @@ export function PlayerSheet() {
                     <label htmlFor={key}>{LABELS[key] ?? key}</label>
                     <select
                       id={key}
+                      className="sheet-select"
                       value={
                         ABILITY_SCORE_OPTIONS.includes(
                           parseInt(sheet[key] ?? "", 10) as (typeof ABILITY_SCORE_OPTIONS)[number]
@@ -435,15 +436,6 @@ export function PlayerSheet() {
                           : ""
                       }
                       onChange={(e) => updateField(key, e.target.value)}
-                      style={{
-                        width: "100%",
-                        padding: "0.5rem 0.6rem",
-                        borderRadius: "6px",
-                        border: "1px solid var(--border)",
-                        background: "var(--panel)",
-                        color: "inherit",
-                        fontSize: "1rem",
-                      }}
                     >
                       <option value="">— Select score —</option>
                       {ABILITY_SCORE_OPTIONS.map((score) => (
