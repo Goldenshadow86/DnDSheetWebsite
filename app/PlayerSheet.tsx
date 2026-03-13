@@ -369,6 +369,8 @@ export function PlayerSheet() {
     if (fileInputRef.current) fileInputRef.current.value = "";
   };
 
+  const [showExportPopup, setShowExportPopup] = useState(false);
+
   const exportTxt = () => {
     const text = buildTxt(sheet);
     const blob = new Blob([text], { type: "text/plain;charset=utf-8" });
@@ -380,10 +382,61 @@ export function PlayerSheet() {
     a.click();
     a.remove();
     URL.revokeObjectURL(url);
+    setShowExportPopup(true);
   };
 
   return (
     <>
+      {showExportPopup && (
+        <div
+          role="dialog"
+          aria-modal="true"
+          aria-labelledby="export-popup-title"
+          style={{
+            position: "fixed",
+            inset: 0,
+            zIndex: 1000,
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            background: "rgba(0,0,0,0.6)",
+          }}
+          onClick={() => setShowExportPopup(false)}
+        >
+          <div
+            style={{
+              background: "var(--surface)",
+              border: "1px solid var(--border)",
+              borderRadius: "8px",
+              padding: "1.5rem 1.75rem",
+              maxWidth: "90vw",
+              width: "37rem",
+              boxShadow: "0 8px 32px rgba(0,0,0,0.4)",
+            }}
+            onClick={(e) => e.stopPropagation()}
+          >
+            <p id="export-popup-title" style={{ marginBottom: "1rem", fontSize: "1rem", lineHeight: 1.5, color: "var(--text)" }}>
+              Go to Discord and type <code style={{ background: "var(--bg)", padding: "0.15rem 0.4rem", borderRadius: "4px" }}>/character import</code> in #playersheet channel to import your player sheet.
+            </p>
+            <button
+              type="button"
+              onClick={() => setShowExportPopup(false)}
+              style={{
+                padding: "0.5rem 1rem",
+                background: "var(--gold)",
+                color: "var(--bg)",
+                border: "none",
+                borderRadius: "6px",
+                cursor: "pointer",
+                fontFamily: "inherit",
+                fontWeight: 600,
+              }}
+            >
+              OK
+            </button>
+          </div>
+        </div>
+      )}
       <div
         style={{
           display: "flex",
